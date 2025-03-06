@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\include",
+    "\\include\\interfaces",
+    "\\src",
+    "\\src\\modules",
+    "\\src\\modules\\cert",
+    "\\src\\modules\\crypto",
+    "\\src\\modules\\hash",
+    "\\src\\modules\\sign"
+  ],
+  "SelectedNode": "\\src\\main.cpp",
+  "PreviewInSolutionExplorer": false
+}

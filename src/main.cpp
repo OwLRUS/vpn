@@ -2,6 +2,10 @@
 #include <memory>
 #include <windows.h>
 
+#include <openssl/evp.h>
+#include <openssl/engine.h>
+#include <openssl/rand.h>
+
 #include "ICrypto.h"
 #include "IHash.h"
 #include "ISign.h"
@@ -11,7 +15,7 @@ using namespace std;
 
 template<typename T>
 unique_ptr<T> loadModule(const string& libName, const string& createFunc) {
-    HMODULE handle = LoadLibraryA(libName.c_str());  // Загрузка библиотеки
+    HMODULE handle = LoadLibraryA(libName.c_str());
     if (!handle) {
         cerr << "Load Error! " << libName << ": " << GetLastError() << endl;
         return nullptr;
@@ -25,7 +29,7 @@ unique_ptr<T> loadModule(const string& libName, const string& createFunc) {
         return nullptr;
     }
 
-    return unique_ptr<T>(create());  // Создаём объект и возвращаем умный указатель
+    return unique_ptr<T>(create()); 
 }
 
 vector<uint8_t> stringToBytes(const string& str) 
@@ -36,6 +40,17 @@ vector<uint8_t> stringToBytes(const string& str)
 string bytesToString(const vector<uint8_t>& bytes) 
 {
     return string(bytes.begin(), bytes.end());
+}
+
+vector<uint8_t> generate_random_bytes(size_t length)
+{
+    vector<uint8_t> buffer(length);
+    if (RAND_bytes(buffer.data(), buffer.size()) != 1) 
+    {
+        cerr << "ERROR: failed to gen random data!\n";
+        exit(1);
+    }
+    return buffer;
 }
 
 int main() {
@@ -51,17 +66,31 @@ int main() {
         return 1;
     }
 
-    cout << "\n--- Testing cryptomodules ---\n";
+    cout << "\n--- Testing Kuznyechik ---\n";
 
-    string dataStr = "Hello world!";
-    string keyStr = "secret";
+    vector<uint8_t> data = stringToBytes("Hello, World! This is a test message.");
+    vector<uint8_t> key = generate_random_bytes(32);
 
-    vector<uint8_t> data = stringToBytes(dataStr);
-    vector<uint8_t> key = stringToBytes(keyStr);
+    cout << "Original data: " << bytesToString(data) << endl;
 
-    vector<uint8_t> encrypted = crypto->encrypt(data, key);
-    cout << "Encrypting data: " << bytesToString(encrypted) << endl;
-    cout << "Decrypting data: " << bytesToString(crypto->decrypt(encrypted, key)) << endl;
+    try {
+        vector<uint8_t> encrypted = crypto->encrypt(data, key);
+        cout << "Encrypted data: " << bytesToString(encrypted) << endl;
+
+        vector<uint8_t> decrypted = crypto->decrypt(encrypted, key);
+        cout << "Decrypted data: " << bytesToString(decrypted) << endl;
+
+        if (decrypted == data) {
+            cout << "Decryption successful!" << endl;
+        }
+        else {
+            cout << "Decryption failed!" << endl;
+        }
+    }
+    catch (const exception& e) {
+        cerr << "Exception caught: " << e.what() << endl;
+    }
+
 
     vector<uint8_t> hashValue = hash->hash(data);
     cout << "Hash: " << bytesToString(hashValue) << endl;

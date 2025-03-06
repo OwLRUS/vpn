@@ -4,6 +4,11 @@ project(CryptoApp)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include")
+set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libcrypto.lib")
+set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD/libssl.lib")
+
 foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_SOURCE_DIR}/bin)
@@ -11,6 +16,7 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${CMAKE_SOURCE_DIR}/lib)
 endforeach()
 
+include_directories(${OPENSSL_INCLUDE_DIR})  # Добавляем include-директорию OpenSSL
 include_directories(include/interfaces)
 
 add_executable(main src/main.cpp)
@@ -29,3 +35,13 @@ set_target_properties(crypto PROPERTIES OUTPUT_NAME "crypto")
 set_target_properties(hash PROPERTIES OUTPUT_NAME "hash")
 set_target_properties(sign PROPERTIES OUTPUT_NAME "sign")
 set_target_properties(cert PROPERTIES OUTPUT_NAME "cert")
+
+# Находим OpenSSL
+find_package(OpenSSL REQUIRED)
+
+# Линкуем OpenSSL к библиотекам и исполняемому файлу
+target_link_libraries(main ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
+target_link_libraries(crypto ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
+target_link_libraries(hash ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
+target_link_libraries(sign ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
+target_link_libraries(cert ${OPENSSL_CRYPTO_LIBRARY} ${OPENSSL_SSL_LIBRARY})
