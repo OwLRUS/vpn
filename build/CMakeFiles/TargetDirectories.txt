@@ -1,7 +1,0 @@
-H:/Сейв/repos/vpn/build/CMakeFiles/main.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/crypto.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/hash.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/sign.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/cert.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/ALL_BUILD.dir
-H:/Сейв/repos/vpn/build/CMakeFiles/ZERO_CHECK.dir
